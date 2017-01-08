@@ -1,3 +1,5 @@
+Unicode true
+
 # Add current directory to plugin path
 !addplugindir .\
 
@@ -53,7 +55,7 @@ var DESKTOPDIR
 UserInfo::GetAccountType
 pop $0
 ${If} $0 != "admin"
-        messageBox mb_iconstop "Administrator rights required!"
+        messageBox mb_iconstop $(msgAdminRequired)
         setErrorLevel 740 ;ERROR_ELEVATION_REQUIRED
         quit
 ${EndIf}
@@ -85,9 +87,65 @@ ${EndIf}
 !insertmacro ENVFUNC ""
 !insertmacro ENVFUNC "un."
 
+
+# Include translations for NSIS default strings
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\Czech.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\Dutch.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\French.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\German.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\Korean.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\Russian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Spanish.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\Swedish.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\TradChinese.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\SimpChinese.nlf"
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\Slovak.nlf"
+
+# Include translations for custom strings
+!include LangEnglish.nsh
+!include LangSpanish.nsh
+
+# Language selection dialog
+Function selectlang
+  Push ""
+  Push ${LANG_ENGLISH}
+  Push English
+  #Push ${LANG_CZECH}
+  #Push čeština‎
+  #Push ${LANG_DUTCH}
+  #Push Nederlands
+  #Push ${LANG_FRENCH}
+  #Push Français
+  #Push ${LANG_GERMAN}
+  #Push Deutsche
+  #Push ${LANG_KOREAN}
+  #Push 한국어
+  #Push ${LANG_RUSSIAN}
+  #Push Русский
+  Push ${LANG_SPANISH}
+  Push Español
+  #Push ${LANG_SWEDISH}
+  #Push Svenska
+  #Push ${LANG_TRADCHINESE}
+  #Push "正體字"
+  #Push ${LANG_SIMPCHINESE}
+  #Push "简化字"
+  #Push ${LANG_SLOVAK}
+  #Push Slovenčina
+  Push A ; A means auto count languages
+         ; for the auto count to work the first empty push (Push "") must remain
+  LangDLL::LangDialog "Language Selection" "Choose a language"
+
+  Pop $LANGUAGE
+  StrCmp $LANGUAGE "cancel" 0 +2
+    Abort
+FunctionEnd
+
 function .onInit
   !insertmacro VerifyUserIsAdmin
   call setenv
+  call selectlang
 functionEnd
 
 # The license page. Can use .txt or .rtf data
@@ -106,13 +164,13 @@ PageExEnd
 
 ## Select the location for Mist's data directory
 #PageEx directory
-#  DirText "Select a location for Mist's data files (watched contracts, etc.)"
+#  DirText $(msgDatadir)
 #  DirVar $DATADIR
 #PageExEnd
 
 # Select the location for the node's data directory
 PageEx directory
-  DirText "Select a location where blockchain data will be stored"
+  DirText $(msgNodeDatadir)
   DirVar $NODEDATADIR
 PageExEnd
 
@@ -221,7 +279,7 @@ Section "uninstall"
     ReadRegStr $2  HKCU "Software\${GROUPNAME} ${APPNAME}" 'DESKTOPDIR'
 
     IfErrors 0 +2
-    MessageBox MB_ICONEXCLAMATION|MB_OK "Unable to read from the registry. Not all shortcuts will be removed"
+    MessageBox MB_ICONEXCLAMATION|MB_OK $(msgRegError)
 
     StrCpy $DATADIR $0
     StrCpy $NODEDATADIR $1
@@ -247,7 +305,7 @@ Section "uninstall"
 SectionEnd
 
 Function un.onUnInstSuccess
-  MessageBox MB_OK "Opening leftover data directories (backup before deleting!)"
+  MessageBox MB_OK $(msgLeftover)
   ExecShell "open" "$DATADIR"
   ExecShell "open" "$NODEDATADIR"
 FunctionEnd

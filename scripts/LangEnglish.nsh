@@ -1,0 +1,5 @@
+LangString msgNodeDatadir ${LANG_ENGLISH} "Select a location where blockchain data will be stored"
+LangString msgDatadir ${LANG_ENGLISH} "Select a location for Mist's data files"
+LangString msgRegError ${LANG_ENGLISH} "Unable to read from the registry. Not all shortcuts will be removed"
+LangString msgLeftover ${LANG_ENGLISH} "Opening remaining data directories (Backup before deleting!)"
+LangString msgAdminRequired ${LANG_ENGLISH} "Administrator rights required"
